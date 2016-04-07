@@ -9,8 +9,8 @@
             [cljs.reader :as reader]))
 
 (def initial-state
-  {:beers  {"beer0" {:id "beer0" :name "Cerveja A" :capacity 0 :price 0}
-            "beer1" {:id "beer1" :name "Cerveja B" :capacity 0 :price 0}}})
+  {:beers  {"beer0" {:id "beer0" :name "Cerveja A" :capacity 0 :price 0 :editing? false}
+            "beer1" {:id "beer1" :name "Cerveja B" :capacity 0 :price 0 :editing? false}}})
 
 (register-handler
   :initialize
@@ -26,6 +26,12 @@
   :change-capacity
   (fn [db [_ id capacity]]
     (update-in db [:beers id :capacity] #(reader/read-string capacity))))
+
+(register-handler
+  :toggle-beer-editing
+  (fn [db [_ id]]
+    (js/console.log (clj->js (get-in db [:beers id :editing?])))
+    (update-in db [:beers id :editing?] not)))
 
 (defn calc-liter-price [{:keys [price capacity]}]
   (when-not (or (zero? price)
@@ -48,6 +54,11 @@
                              @beers)]
       (reaction (first (sort-by :liter-price beers-with-liter))))))
 
+(register-sub
+  :editing-beer?
+  (fn [db [_ id]]
+    (reaction (get-in @db [:beers id :editing?]))))
+
 (defn title []
   [:header
    [:p "Calculadora para comprar mais gastando menos"]])
@@ -61,43 +72,49 @@
      [:p "Preço: " (:price @best-beer)]
      [:p "Preço por litro: " (:liter-price @best-beer)]]))
 
-(defn beer-item [{:keys [name price capacity]}]
-  (let [price-format (str "R$ " (.toFixed price 2))
-        capacity-format (str capacity "ml")]
-    [:li.mdl-list__item.mdl-list__item--two-line {:key (str name "-" capacity "-item")}
-     [:span.mdl-list__item-primary-content
-      [:i.material-icons.mdl-list__item-avatar "C"]
-      [:span name]
-      [:span.mdl-list__item-sub-title (str price-format " - " capacity-format)]]]))
+(defn beer-item [{:keys [id name price capacity]}]
+  (let [form-price (r/atom 0)
+        form-capacity (r/atom 0)
+        price-format (str "R$ " (.toFixed price 2))
+        capacity-format (str capacity "ml")
+        editing? (subscribe [:editing-beer? id])]
+    [:li {:key (str name "-" capacity "-item")}
+     [:div.mdl-list__item.mdl-list__item--two-line
+      [:span.mdl-list__item-primary-content
+       [:i.material-icons.mdl-list__item-avatar "C"]
+       [:span name]
+       [:span.mdl-list__item-sub-title (str price-format " - " capacity-format)]]
+      [:span.mdl-list__item-secondary-content
+       (when-not @editing?
+         [:button.mdl-list__item-secondary-action
+          {:on-click #(dispatch [:toggle-beer-editing id])}
+          "Editar"])]]
+     (when @editing?
+       [:div.mdl-list__item.beer-item
+        [:span.mdl-list__item-primary-content
+         [:label "R$"]
+         [:input {:type "number"
+                  :step "0.01"
+                  :on-change #(reset! form-price (-> % .-target .-value))}]
+         [:label "ml"]
+         [:input {:type "number"
+                  :step "1"
+                  :on-change #(reset! form-capacity (-> % .-target .-value))}]]
+        [:button.mdl-list__item-secondary-action
+         {:on-click #(do
+                       (dispatch [:change-price id @form-price])
+                       (dispatch [:change-capacity id @form-capacity])
+                       (dispatch [:toggle-beer-editing id]))}
+         "Salvar"]])]))
 
 (defn beer-list [beers]
   [:ul.mdl-list
-   (map beer-item beers)])
-
-(defn make-beer [beer]
-  (let [form-price (r/atom 0)
-        form-capacity (r/atom 0)]
-    [:article {:key (:id beer)}
-     [:h4>em (:name beer)]
-     [:div.beer-item
-      [:label "R$"]
-      [:input {:type "number"
-               :step "0.01"
-               :on-change #(reset! form-price (-> % .-target .-value))
-               :on-blur #(dispatch
-                           [:change-price (:id beer) @form-price])}]
-      [:label "ml"]
-      [:input {:type "number"
-               :step "1"
-               :on-change #(reset! form-capacity (-> % .-target .-value))
-               :on-blur #(dispatch
-                           [:change-capacity (:id beer) @form-capacity])}]]]))
+   (doall (map beer-item beers))])
 
 (defn main-panel []
   (let [beers (subscribe [:all-beers])]
     [:section
      [title]
-     ;;(map make-beer @beers)
      [beer-list @beers]
      [results]]))
 
