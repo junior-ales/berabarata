@@ -20,17 +20,20 @@
 (register-handler
   :change-price
   (fn [db [_ id price]]
-    (update-in db [:beers id :price] #(reader/read-string price))))
+    (if (number? price)
+      db
+      (update-in db [:beers id :price] #(reader/read-string price)))))
 
 (register-handler
   :change-capacity
   (fn [db [_ id capacity]]
-    (update-in db [:beers id :capacity] #(reader/read-string capacity))))
+    (if (number? capacity)
+      db
+      (update-in db [:beers id :capacity] #(reader/read-string capacity)))))
 
 (register-handler
   :toggle-beer-editing
   (fn [db [_ id]]
-    (js/console.log (clj->js (get-in db [:beers id :editing?])))
     (update-in db [:beers id :editing?] not)))
 
 (defn calc-liter-price [{:keys [price capacity]}]
