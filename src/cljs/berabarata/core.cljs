@@ -50,7 +50,6 @@
 
 (defn title []
   [:header
-   [:h1 "Bera Barata"]
    [:p "Calculadora para comprar mais gastando menos"]])
 
 (defn results []
@@ -61,6 +60,19 @@
      [:p "Tamanho: " (:capacity @best-beer)]
      [:p "Preço: " (:price @best-beer)]
      [:p "Preço por litro: " (:liter-price @best-beer)]]))
+
+(defn beer-item [{:keys [name price capacity]}]
+  (let [price-format (str "R$ " (.toFixed price 2))
+        capacity-format (str capacity "ml")]
+    [:li.mdl-list__item.mdl-list__item--two-line {:key (str name "-" capacity "-item")}
+     [:span.mdl-list__item-primary-content
+      [:i.material-icons.mdl-list__item-avatar "C"]
+      [:span name]
+      [:span.mdl-list__item-sub-title (str price-format " - " capacity-format)]]]))
+
+(defn beer-list [beers]
+  [:ul.mdl-list
+   (map beer-item beers)])
 
 (defn make-beer [beer]
   (let [form-price (r/atom 0)
@@ -85,7 +97,8 @@
   (let [beers (subscribe [:all-beers])]
     [:section
      [title]
-     (map make-beer @beers)
+     ;;(map make-beer @beers)
+     [beer-list @beers]
      [results]]))
 
 (defn ^:export init []
