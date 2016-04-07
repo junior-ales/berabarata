@@ -1,0 +1,13 @@
+.beer-item {
+
+  & > * {
+    width: 25%;
+    padding: 5px;
+  }
+}
+
+.calculate {
+  padding: 5px;
+  margin-top: 20px;
+  width: 100%;
+}
