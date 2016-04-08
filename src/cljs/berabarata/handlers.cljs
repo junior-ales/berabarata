@@ -12,6 +12,13 @@
     (merge db initial-state)))
 
 (register-handler
+  :change-name
+  (fn [db [_ id name]]
+    (if (empty? (clojure.string/trim (or name "")))
+      db
+      (update-in db [:beers id :name] #(str name)))))
+
+(register-handler
   :change-price
   (fn [db [_ id price]]
     (if (number? price)

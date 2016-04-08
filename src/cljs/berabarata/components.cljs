@@ -4,7 +4,7 @@
 
 (defn title []
   [:header
-   [:h4 "Lista de Compras"]])
+   [:h4.title "Lista de Compras"]])
 
 (defn results []
   (let [best-beer (subscribe [:best-beer])
@@ -39,14 +39,18 @@
          "Editar"])]]))
 
 (defn beer-item-edit [{:keys [id price capacity editing?]}]
-  (let [form-price (r/atom 0)
+  (let [form-name (r/atom "")
+        form-price (r/atom 0)
         form-capacity (r/atom 0)]
     (when editing?
       [:div.mdl-list__item.beer-item
        [:span.mdl-list__item-primary-content
+        [:label "Item/Marca"]
+        [:input {:type "text"
+                 :auto-focus true
+                 :on-change #(reset! form-name (-> % .-target .-value))}]
         [:label "R$"]
         [:input {:type "number"
-                 :auto-focus true
                  :step "0.01"
                  :on-change #(reset! form-price (-> % .-target .-value))}]
         [:label "ml"]
@@ -55,6 +59,7 @@
                  :on-change #(reset! form-capacity (-> % .-target .-value))}]]
        [:button.mdl-list__item-secondary-action
         {:on-click #(do
+                      (dispatch [:change-name id @form-name])
                       (dispatch [:change-price id @form-price])
                       (dispatch [:change-capacity id @form-capacity])
                       (dispatch [:toggle-beer-editing id]))}
