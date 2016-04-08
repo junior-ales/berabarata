@@ -6,12 +6,11 @@ html, body {
   margin-top: 0;
 }
 
-.beer-item {
-  & input {
-    width: 15%;
-    margin: 0 5px;
-    padding: 5px;
-  }
+.edit-item-box {
+  margin-right: 10px;
+  width: 20%;
+
+  &:first-child { width: 50%; }
 }
 
 .results-table {

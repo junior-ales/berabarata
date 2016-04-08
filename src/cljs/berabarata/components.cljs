@@ -43,20 +43,35 @@
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
     (when editing?
-      [:div.mdl-list__item.beer-item
+      [:div.mdl-list__item
        [:span.mdl-list__item-primary-content
-        [:label "Item/Marca"]
-        [:input {:type "text"
-                 :auto-focus true
-                 :on-change #(reset! form-name (-> % .-target .-value))}]
-        [:label "R$"]
-        [:input {:type "number"
-                 :step "0.01"
-                 :on-change #(reset! form-price (-> % .-target .-value))}]
-        [:label "ml"]
-        [:input {:type "number"
-                 :step "1"
-                 :on-change #(reset! form-capacity (-> % .-target .-value))}]]
+        [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
+         [:input {:id (str id "edit-item-name")
+                  :class "mdl-textfield__input"
+                  :type "text"
+                  :auto-focus true
+                  :on-change #(reset! form-name (-> % .-target .-value))}]
+         [:label
+          {:class "mdl-textfield__label" :for (str id "edit-item-name")}
+          "Item/Marca"]]
+        [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
+         [:input {:id (str id "edit-item-price")
+                  :class "mdl-textfield__input"
+                  :type "number"
+                  :step "0.01"
+                  :on-change #(reset! form-price (-> % .-target .-value))}]
+         [:label
+          {:class "mdl-textfield__label" :for (str id "edit-item-price")}
+          "Preço (R$)"]]
+        [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
+         [:input {:id (str id "edit-item-capacity")
+                  :class "mdl-textfield__input"
+                  :type "number"
+                  :step "1"
+                  :on-change #(reset! form-capacity (-> % .-target .-value))}]
+         [:label
+          {:class "mdl-textfield__label" :for (str id "edit-item-capacity")}
+          "Tamanho"]]]
        [:button.mdl-list__item-secondary-action
         {:on-click #(do
                       (dispatch [:change-name id @form-name])
