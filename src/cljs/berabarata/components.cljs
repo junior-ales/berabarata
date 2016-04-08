@@ -27,7 +27,7 @@
 (defn beer-item-display [{:keys [id name price capacity editing?]}]
   (let [price-format (str "R$ " (.toFixed price 2))
         capacity-format (str capacity "ml")]
-    [:div.mdl-list__item.mdl-list__item--two-line
+    [:div.show-item-wrapper.mdl-list__item.mdl-list__item--two-line
      [:span.mdl-list__item-primary-content
       [:i.material-icons.mdl-list__item-avatar "C"]
       [:span name]
@@ -43,7 +43,7 @@
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
     (when editing?
-      [:div.mdl-list__item
+      [:div.edit-item-wrapper.mdl-list__item
        [:span.mdl-list__item-primary-content
         [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
          [:input {:id (str id "edit-item-name")
