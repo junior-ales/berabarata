@@ -37,6 +37,7 @@
        [:span.mdl-list__item-primary-content
         [:label "R$"]
         [:input {:type "number"
+                 :auto-focus true
                  :step "0.01"
                  :on-change #(reset! form-price (-> % .-target .-value))}]
         [:label "ml"]
