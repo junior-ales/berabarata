@@ -7,13 +7,22 @@
    [:h4 "Lista de Compras"]])
 
 (defn results []
-  (let [best-beer (subscribe [:best-beer])]
-    [:section
-     [:h3 "Cerveja Mais Em Conta"]
-     [:p "Nome: " (:name @best-beer)]
-     [:p "Tamanho: " (:capacity @best-beer)]
-     [:p "Preço: " (:price @best-beer)]
-     [:p "Preço por litro: " (:liter-price @best-beer)]]))
+  (let [best-beer (subscribe [:best-beer])
+        liter-price (or (:liter-price @best-beer) 0)]
+    (when-not (zero? liter-price)
+      [:section
+       [:h5 "Resultado"]
+       [:table.mdl-data-table.mdl-shadow--2dp.results-table
+        [:thead
+         [:tr
+          [:th.mdl-data-table__cell--non-numeric "Nome"]
+          [:th "Embalagem"]
+          [:th "Preço Litro"]]]
+        [:tbody
+         [:tr
+          [:td.mdl-data-table__cell--non-numeric (:name @best-beer)]
+          [:td (str (:capacity @best-beer) "ml")]
+          [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
 (defn beer-item-display [{:keys [id name price capacity editing?]}]
   (let [price-format (str "R$ " (.toFixed price 2))
