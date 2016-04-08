@@ -38,6 +38,16 @@
          {:on-click #(dispatch [:toggle-beer-editing id])}
          [:img.icon {:src "./images/icon-more.png" }]])]]))
 
+(defn input-field [{:keys [id type autofocus? step input-atom label]}]
+  [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
+   [:input {:id id
+            :class "mdl-textfield__input"
+            :type type
+            :auto-focus (or autofocus? false)
+            :step step
+            :on-change #(reset! input-atom (-> % .-target .-value))}]
+   [:label {:class "mdl-textfield__label" :for id} label]])
+
 (defn beer-item-edit [{:keys [id price capacity editing?]}]
   (let [form-name (r/atom "")
         form-price (r/atom 0)
@@ -45,33 +55,21 @@
     (when editing?
       [:div.edit-item-wrapper.mdl-list__item
        [:span.mdl-list__item-primary-content
-        [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
-         [:input {:id (str id "edit-item-name")
-                  :class "mdl-textfield__input"
-                  :type "text"
-                  :auto-focus true
-                  :on-change #(reset! form-name (-> % .-target .-value))}]
-         [:label
-          {:class "mdl-textfield__label" :for (str id "edit-item-name")}
-          "Item/Marca"]]
-        [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
-         [:input {:id (str id "edit-item-price")
-                  :class "mdl-textfield__input"
-                  :type "number"
-                  :step "0.01"
-                  :on-change #(reset! form-price (-> % .-target .-value))}]
-         [:label
-          {:class "mdl-textfield__label" :for (str id "edit-item-price")}
-          "Preço (R$)"]]
-        [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
-         [:input {:id (str id "edit-item-capacity")
-                  :class "mdl-textfield__input"
-                  :type "number"
-                  :step "1"
-                  :on-change #(reset! form-capacity (-> % .-target .-value))}]
-         [:label
-          {:class "mdl-textfield__label" :for (str id "edit-item-capacity")}
-          "Tamanho"]]]
+        [input-field {:id (str id "edit-item-name")
+                      :type "text"
+                      :autofocus? true
+                      :input-atom form-name
+                      :label "Item/Marca"}]
+        [input-field {:id (str id "edit-item-price")
+                      :type "number"
+                      :step "0.01"
+                      :input-atom form-price
+                      :label "Preço (R$)"}]
+        [input-field {:id (str id "edit-item-capacity")
+                      :type "number"
+                      :step "1"
+                      :input-atom form-capacity
+                      :label "Tamanho"}]]
        [:button.save-button.mdl-list__item-secondary-action
         {:on-click #(do
                       (dispatch [:change-name id @form-name])
