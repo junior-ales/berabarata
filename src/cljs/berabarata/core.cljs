@@ -1,70 +1,13 @@
 (ns berabarata.core
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core  :as    r]
-            [re-frame.core :refer [register-handler
-                                   register-sub
-                                   dispatch
+            [re-frame.core :refer [dispatch
                                    dispatch-sync
-                                   subscribe]]
-            [cljs.reader :as reader]))
-
-(def initial-state
-  {:beers  {"beer0" {:id "beer0" :name "Cerveja A" :capacity 0 :price 0 :editing? false}
-            "beer1" {:id "beer1" :name "Cerveja B" :capacity 0 :price 0 :editing? false}}})
-
-(register-handler
-  :initialize
-  (fn [db _]
-    (merge db initial-state)))
-
-(register-handler
-  :change-price
-  (fn [db [_ id price]]
-    (if (number? price)
-      db
-      (update-in db [:beers id :price] #(reader/read-string price)))))
-
-(register-handler
-  :change-capacity
-  (fn [db [_ id capacity]]
-    (if (number? capacity)
-      db
-      (update-in db [:beers id :capacity] #(reader/read-string capacity)))))
-
-(register-handler
-  :toggle-beer-editing
-  (fn [db [_ id]]
-    (update-in db [:beers id :editing?] not)))
-
-(defn calc-liter-price [{:keys [price capacity]}]
-  (when-not (or (zero? price)
-                (zero? capacity))
-    (-> price
-        (* 1000.0)
-        (/ capacity))))
-
-(register-sub
-  :all-beers
-  (fn [db]
-    (reaction (vals (:beers @db)))))
-
-(register-sub
-  :best-beer
-  (fn [db]
-    (let [beers (subscribe [:all-beers])
-          beers-with-liter (map
-                             #(assoc % :liter-price (calc-liter-price %))
-                             @beers)]
-      (reaction (first (sort-by :liter-price beers-with-liter))))))
-
-(register-sub
-  :editing-beer?
-  (fn [db [_ id]]
-    (reaction (get-in @db [:beers id :editing?]))))
+                                   subscribe]]))
 
 (defn title []
   [:header
-   [:p "Calculadora para comprar mais gastando menos"]])
+   [:h4 "Lista de Compras"]])
 
 (defn results []
   (let [best-beer (subscribe [:best-beer])]
