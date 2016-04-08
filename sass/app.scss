@@ -18,6 +18,21 @@ html, body {
   &:first-child { width: 45%; }
 }
 
+.edit-button, .save-button {
+  background: none;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
+
+  & > .icon {
+    width: 25px;
+    height: 25px;
+    padding-left: 10px;
+  }
+}
+
 .results-table {
   width: 100%;
 }

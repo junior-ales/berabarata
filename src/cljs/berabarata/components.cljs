@@ -34,9 +34,9 @@
       [:span.mdl-list__item-sub-title (str price-format " - " capacity-format)]]
      [:span.mdl-list__item-secondary-content
       (when-not editing?
-        [:button.mdl-list__item-secondary-action
+        [:button.edit-button.mdl-list__item-secondary-action
          {:on-click #(dispatch [:toggle-beer-editing id])}
-         "Editar"])]]))
+         [:img.icon {:src "./images/icon-more.png" }]])]]))
 
 (defn beer-item-edit [{:keys [id price capacity editing?]}]
   (let [form-name (r/atom "")
@@ -72,13 +72,13 @@
          [:label
           {:class "mdl-textfield__label" :for (str id "edit-item-capacity")}
           "Tamanho"]]]
-       [:button.mdl-list__item-secondary-action
+       [:button.save-button.mdl-list__item-secondary-action
         {:on-click #(do
                       (dispatch [:change-name id @form-name])
                       (dispatch [:change-price id @form-price])
                       (dispatch [:change-capacity id @form-capacity])
                       (dispatch [:toggle-beer-editing id]))}
-        "Salvar"]])))
+        [:img.icon {:src "./images/icon-done.png" }]]])))
 
 (defn beer-item [{:keys [id] :as beer}]
   [:li {:key (str id "-item")}
