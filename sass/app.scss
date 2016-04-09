@@ -19,6 +19,16 @@ html, body {
   padding-left: 0;
   padding-right: 0;
 
+  &.-new {
+    .label {
+      color: #BDBDBD;
+    }
+
+    .edit-item-box {
+      width: 60%;
+    }
+  }
+
   &.-disabled {
     opacity: .6;
 
@@ -36,10 +46,6 @@ html, body {
       font-size: 35px;
     }
   }
-}
-
-.new-item {
-  color: #BDBDBD;
 }
 
 .edit-item-box {

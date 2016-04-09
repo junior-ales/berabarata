@@ -96,15 +96,15 @@
    [beer-item-edit beer]])
 
 (defn new-item-field []
-  [:div.item-wrapper.mdl-list__item {:on-click #(dispatch [:edit-new-item])}
+  [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:edit-new-item])}
    [:span.mdl-list__item-primary-content
     [:i.new-item-avatar.material-icons.mdl-list__item-avatar
      [:span.icon "✚"]]
-    [:span.new-item "Novo item..."]]])
+    [:span.label "Novo item..."]]])
 
 (defn new-item-field-editing []
   (let [form-new-name (r/atom "")]
-    [:div.item-wrapper.mdl-list__item
+    [:div.item-wrapper.-new.mdl-list__item
      [:span.mdl-list__item-primary-content
       [:i.new-item-avatar.material-icons.mdl-list__item-avatar
        [:span.icon
