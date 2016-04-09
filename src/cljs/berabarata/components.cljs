@@ -63,6 +63,7 @@
        [:span.mdl-list__item-primary-content
         [:input {:class "toggle-item-status"
                  :type "checkbox"
+                 :checked (not enabled?)
                  :on-change #(dispatch [:toggle-item-state id])}]
         [:span {:on-click #(dispatch [:toggle-item-editing id])}
          [:span.item-name name]
