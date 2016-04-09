@@ -1,13 +1,13 @@
 (ns berabarata.core
   (:require [reagent.core          :as    r]
             [re-frame.core         :refer [dispatch-sync subscribe]]
-            [berabarata.components :refer [title beer-list results]]))
+            [berabarata.components :refer [title item-list results]]))
 
 (defn main-panel []
   (let [beers (subscribe [:all-beers])]
     [:section
      [title]
-     [beer-list @beers]
+     [item-list @beers]
      [results]]))
 
 (defn ^:export init []

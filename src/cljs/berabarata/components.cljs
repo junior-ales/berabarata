@@ -28,7 +28,7 @@
           [:td (str (:capacity @best-beer) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
-(defn beer-item-display [{:keys [id name brand price capacity editing? enabled?]}]
+(defn item-display [{:keys [id name brand price capacity editing? enabled?]}]
   (let [price-format (when-not (zero? price)
                        (str "R$ " (.toFixed price 2)))
         capacity-format (when-not (zero? capacity)
@@ -61,7 +61,7 @@
             :on-change #(reset! input-atom (-> % .-target .-value))}]
    [:label {:class "mdl-textfield__label" :for id} label]])
 
-(defn beer-item-edit [{:keys [id price capacity editing?]}]
+(defn item-compare [{:keys [id price capacity editing?]}]
   (let [form-brand (r/atom "")
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
@@ -91,19 +91,19 @@
                       (dispatch [:toggle-item-editing id]))}
         [:img.icon {:src "./images/icon-done.png" }]]])))
 
-(defn beer-item [beer]
-  [:li {:key (str (:id beer) "-item")}
-   [beer-item-display beer]
-   [beer-item-edit beer]])
+(defn item [item]
+  [:li {:key (str (:id item) "-item")}
+   [item-display item]
+   [item-compare item]])
 
-(defn new-item-field []
+(defn item-new []
   [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:edit-new-item])}
    [:span.mdl-list__item-primary-content
     [:i.new-item-avatar.material-icons.mdl-list__item-avatar
      [:span.icon "✚"]]
     [:span.label "Novo item..."]]])
 
-(defn new-item-field-editing []
+(defn item-edit []
   (let [form-new-name (r/atom "")]
     [:div.item-wrapper.-new.mdl-list__item
      [:span.mdl-list__item-primary-content
@@ -119,13 +119,13 @@
       {:on-click #(dispatch [:create-new-item @form-new-name])}
       [:img.icon {:src "./images/icon-done.png" }]]]))
 
-(defn new-item []
+(defn add-new-item []
   (let [editing-new-item? (subscribe [:editing-new-item?])]
     (if @editing-new-item?
-      [new-item-field-editing]
-      [new-item-field])))
+      [item-edit]
+      [item-new])))
 
-(defn beer-list [beers]
+(defn item-list [items]
   [:ul.mdl-list
-   (map beer-item beers)
-   [new-item]])
+   (map item items)
+   [add-new-item]])
