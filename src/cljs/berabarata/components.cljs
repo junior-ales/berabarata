@@ -31,18 +31,16 @@
                           (str capacity "ml"))
         item-info (when (or price-format capacity-format)
                     (apply str (interpose " ⸳ " (remove nil? [price-format capacity-format]))))
-        default-classes "item-wrapper mdl-list__item mdl-list__item--two-line"]
-    [:div {:class (str default-classes (when-not enabled? (str " -disabled")))}
+        default-classes "item-wrapper mdl-list__item"]
+    [:div {:class (str default-classes
+                       (when-not enabled? (str " -disabled"))
+                       (when-not (nil? item-info) (str " -with-info mdl-list__item--two-line")))}
      [:span.mdl-list__item-primary-content
-      [:i.checkbox-avatar.mdl-list__item-avatar
-       [:label.label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect
-        {:for (str id "-item-checkbox")}
-        [:input.mdl-checkbox__input
-         {:id (str id "-item-checkbox")
-          :type "checkbox"
-          :on-change #(dispatch [:toggle-item-state id])}]]]
+      [:input {:class "toggle-item-status"
+               :type "checkbox"
+               :on-change #(dispatch [:toggle-item-state id])}]
       [:span.item-name name]
-      [:span.mdl-list__item-sub-title item-info]]
+      [:span.item-info.mdl-list__item-sub-title item-info]]
      [:span.mdl-list__item-secondary-content
       (when-not editing?
         [:button.edit-button.mdl-list__item-secondary-action

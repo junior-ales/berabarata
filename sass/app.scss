@@ -6,15 +6,6 @@ html, body {
   margin-top: 0;
 }
 
-.checkbox-avatar {
-  background: none;
-
-  & > .label {
-    margin-left: 10px;
-    margin-top: 3px;
-  }
-}
-
 .item-wrapper {
   padding-left: 0;
   padding-right: 0;
@@ -35,6 +26,33 @@ html, body {
     & .item-name {
       text-decoration: line-through;
     }
+  }
+
+  &.-with-info {
+    & .item-name {
+      top: -15px;
+      position: relative;
+    }
+
+    & .item-info {
+      margin-left: 55px;
+      position: relative;
+      top: -15px;
+    }
+
+    & .toggle-item-status {
+      margin-top: 10px;
+    }
+  }
+
+  & .toggle-item-status {
+    margin: 0 15px;
+    width: 20px;
+    height: 20px;
+  }
+
+  & .item-name {
+    margin-left: 5px;
   }
 
   & .new-item-avatar {
