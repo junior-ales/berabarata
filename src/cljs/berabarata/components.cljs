@@ -28,29 +28,6 @@
           [:td (str (:capacity @best-beer) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
-(defn display-item [{:keys [id name brand price capacity comparing? enabled?]}]
-  (let [price-format (when-not (zero? price)
-                       (str "R$ " (.toFixed price 2)))
-        capacity-format (when-not (zero? capacity)
-                          (str capacity "ml"))
-        item-info (when (or brand price-format capacity-format)
-                    (interpose-sep " ⸳ " [brand price-format capacity-format]))
-        default-classes "item-wrapper mdl-list__item"]
-    [:div {:class (str default-classes
-                       (when-not enabled? (str " -disabled"))
-                       (when-not (nil? item-info) (str " -with-info mdl-list__item--two-line")))}
-     [:span.mdl-list__item-primary-content
-      [:input {:class "toggle-item-status"
-               :type "checkbox"
-               :on-change #(dispatch [:toggle-item-state id])}]
-      [:span.item-name name]
-      [:span.item-info.mdl-list__item-sub-title item-info]]
-     [:span.mdl-list__item-secondary-content
-      (when-not comparing?
-        [:button.edit-button.mdl-list__item-secondary-action
-         {:on-click #(dispatch [:toggle-item-comparing id])}
-         [:img.icon {:src "./images/icon-more.png" }]])]]))
-
 (defn input-field [{:keys [id type autofocus? step input-atom label]}]
   [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
    [:input {:id id
@@ -61,12 +38,52 @@
             :on-change #(reset! input-atom (-> % .-target .-value))}]
    [:label {:class "mdl-textfield__label" :for id} label]])
 
+(defn display-item [{:keys [id name brand price capacity comparing? editing? enabled?]}]
+  (let [form-name       (r/atom "")
+        price-format    (when-not (zero? price)
+                          (str "R$ " (.toFixed price 2)))
+        capacity-format (when-not (zero? capacity)
+                          (str capacity "ml"))
+        item-info       (when (or brand price-format capacity-format)
+                          (interpose-sep " ⸳ " [brand price-format capacity-format]))]
+    [:div {:class (str "item-wrapper mdl-list__item"
+                       (when editing? " -editing")
+                       (when-not enabled? " -disabled")
+                       (when-not (nil? item-info) " -with-info mdl-list__item--two-line"))}
+     (if editing?
+       [:span.mdl-list__item-primary-content
+        [:i.item-avatar.material-icons.mdl-list__item-avatar
+         [:span.icon
+          {:on-click #(dispatch [:toggle-item-editing id])} "✖"]]
+        [input-field {:id (str id "edit-item-name")
+                      :type "text"
+                      :autofocus? true
+                      :input-atom form-name
+                      :label "Nome"}]]
+       [:span.mdl-list__item-primary-content
+        [:input {:class "toggle-item-status"
+                 :type "checkbox"
+                 :on-change #(dispatch [:toggle-item-state id])}]
+        [:span {:on-click #(dispatch [:toggle-item-editing id])}
+         [:span.item-name name]
+         [:span.item-info.mdl-list__item-sub-title item-info]]])
+     (when editing?
+       [:button.save-button.mdl-list__item-secondary-action
+        {:on-click #(do
+                      (dispatch [:change-name id @form-name])
+                      (dispatch [:toggle-item-editing id]))}
+        [:img.icon {:src "./images/icon-done.png" }]])
+     (when-not (or editing? comparing?)
+       [:button.edit-button.mdl-list__item-secondary-action
+        {:on-click #(dispatch [:toggle-item-comparing id])}
+        [:img.icon {:src "./images/icon-more.png" }]])]))
+
 (defn compare-item [{:keys [id price capacity comparing?]}]
   (let [form-brand (r/atom "")
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
     (when comparing?
-      [:div.item-wrapper.mdl-list__item
+      [:div.item-wrapper.-comparing.mdl-list__item
        [:span.mdl-list__item-primary-content
         [input-field {:id (str id "edit-item-brand")
                       :type "text"
@@ -99,7 +116,7 @@
 (defn new-item []
   [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:edit-new-item])}
    [:span.mdl-list__item-primary-content
-    [:i.new-item-avatar.material-icons.mdl-list__item-avatar
+    [:i.item-avatar.material-icons.mdl-list__item-avatar
      [:span.icon "✚"]]
     [:span.label "Novo item..."]]])
 
@@ -107,7 +124,7 @@
   (let [form-new-name (r/atom "")]
     [:div.item-wrapper.-new.mdl-list__item
      [:span.mdl-list__item-primary-content
-      [:i.new-item-avatar.material-icons.mdl-list__item-avatar
+      [:i.item-avatar.material-icons.mdl-list__item-avatar
        [:span.icon
         {:on-click #(dispatch [:edit-new-item])} "✖"]]
       [input-field {:id "edit-new-item-name"

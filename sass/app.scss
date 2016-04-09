@@ -7,8 +7,26 @@ html, body {
 }
 
 .item-wrapper {
-  padding-left: 0;
-  padding-right: 0;
+  padding: 0;
+  min-height: 70px;
+
+  &.-editing {
+    & .edit-item-box {
+      margin-right: 0;
+      width: 80%;
+    }
+
+    &.-with-info .edit-item-box {
+      position: relative;
+      top: -15px;
+    }
+  }
+
+  &.-comparing {
+    min-height: initial;
+    position: relative;
+    top: -15px;
+  }
 
   &.-new {
     .label {
@@ -16,7 +34,8 @@ html, body {
     }
 
     .edit-item-box {
-      width: 60%;
+      margin-right: 0;
+      width: 80%;
     }
   }
 
@@ -41,7 +60,7 @@ html, body {
     }
 
     & .toggle-item-status {
-      margin-top: 10px;
+      margin-top: 8px;
     }
   }
 
@@ -55,7 +74,7 @@ html, body {
     margin-left: 5px;
   }
 
-  & .new-item-avatar {
+  & .item-avatar {
     background: none;
     color: #424242;
 

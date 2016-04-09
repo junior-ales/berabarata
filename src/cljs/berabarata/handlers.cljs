@@ -44,6 +44,11 @@
     (update-in db [:beers id :comparing?] not)))
 
 (register-handler
+  :toggle-item-editing
+  (fn [db [_ id]]
+    (update-in db [:beers id :editing?] not)))
+
+(register-handler
   :edit-new-item
   (fn [db]
     (update-in db [:editing-new-item?] not)))
@@ -55,6 +60,7 @@
    :capacity 0
    :price 0
    :enabled? true
+   :editing? false
    :comparing? false})
 
 (register-handler
