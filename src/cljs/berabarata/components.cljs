@@ -90,29 +90,34 @@
    [beer-item-display beer]
    [beer-item-edit beer]])
 
-(defn new-item []
-  (let [editing-new-item? (subscribe [:editing-new-item?])
-        form-new-name (r/atom "")]
+(defn new-item-field []
+  [:div.item-wrapper.mdl-list__item {:on-click #(dispatch [:edit-new-item])}
+   [:span.mdl-list__item-primary-content
+    [:i.new-item-avatar.material-icons.mdl-list__item-avatar
+     [:span.icon "✚"]]
+    [:span.new-item "Novo item..."]]])
+
+(defn new-item-field-editing []
+  (let [form-new-name (r/atom "")]
     [:div.item-wrapper.mdl-list__item
      [:span.mdl-list__item-primary-content
       [:i.new-item-avatar.material-icons.mdl-list__item-avatar
        [:span.icon
-        {:on-click #(dispatch [:edit-new-item])}
-        (if @editing-new-item? "✖" "✚")]]
-      (if @editing-new-item?
-        [:div
-         [input-field {:id "edit-new-item-name"
-                       :autofocus? true
-                       :type "text"
-                       :input-atom form-new-name
-                       :label "Nome"}]
-         [:button.save-button.mdl-list__item-secondary-action
-          {:on-click #(dispatch [:create-new-item @form-new-name])}
-          [:img.icon {:src "./images/icon-done.png" }]]]
-        [:div
-         [:span.new-item
-          {:on-click #(dispatch [:edit-new-item])}
-          "Novo item..."]])]]))
+        {:on-click #(dispatch [:edit-new-item])} "✖"]]
+      [input-field {:id "edit-new-item-name"
+                    :autofocus? true
+                    :type "text"
+                    :input-atom form-new-name
+                    :label "Nome"}]]
+     [:button.save-button.mdl-list__item-secondary-action
+      {:on-click #(dispatch [:create-new-item @form-new-name])}
+      [:img.icon {:src "./images/icon-done.png" }]]]))
+
+(defn new-item []
+  (let [editing-new-item? (subscribe [:editing-new-item?])]
+    (if @editing-new-item?
+      [new-item-field-editing]
+      [new-item-field])))
 
 (defn beer-list [beers]
   [:ul.mdl-list
