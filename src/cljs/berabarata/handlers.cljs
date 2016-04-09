@@ -18,6 +18,13 @@
       (update-in db [:beers id :name] #(str name)))))
 
 (register-handler
+  :change-brand
+  (fn [db [_ id brand]]
+    (if (empty? (clojure.string/trim (or brand "")))
+      db
+      (update-in db [:beers id :brand] #(str brand)))))
+
+(register-handler
   :change-price
   (fn [db [_ id price]]
     (if (number? price)
@@ -44,6 +51,7 @@
 (defn make-item [id name]
   {:id id
    :name name
+   :brand nil
    :capacity 0
    :price 0
    :enabled? true

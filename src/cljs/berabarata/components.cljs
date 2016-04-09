@@ -6,6 +6,9 @@
   [:header
    [:h4.title "Lista de Compras"]])
 
+(defn interpose-sep [separator items]
+  (apply str (interpose separator (remove nil? items))))
+
 (defn results []
   (let [best-beer (subscribe [:best-beer])
         liter-price (or (:liter-price @best-beer) 0)]
@@ -20,17 +23,18 @@
           [:th "Preço Litro"]]]
         [:tbody
          [:tr
-          [:td.mdl-data-table__cell--non-numeric (:name @best-beer)]
+          [:td.mdl-data-table__cell--non-numeric (interpose-sep " ⸳ "
+                                                                [(:name @best-beer) (:brand @best-beer)])]
           [:td (str (:capacity @best-beer) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
-(defn beer-item-display [{:keys [id name price capacity editing? enabled?]}]
+(defn beer-item-display [{:keys [id name brand price capacity editing? enabled?]}]
   (let [price-format (when-not (zero? price)
                        (str "R$ " (.toFixed price 2)))
         capacity-format (when-not (zero? capacity)
                           (str capacity "ml"))
-        item-info (when (or price-format capacity-format)
-                    (apply str (interpose " ⸳ " (remove nil? [price-format capacity-format]))))
+        item-info (when (or brand price-format capacity-format)
+                    (interpose-sep " ⸳ " [brand price-format capacity-format]))
         default-classes "item-wrapper mdl-list__item"]
     [:div {:class (str default-classes
                        (when-not enabled? (str " -disabled"))
@@ -58,17 +62,17 @@
    [:label {:class "mdl-textfield__label" :for id} label]])
 
 (defn beer-item-edit [{:keys [id price capacity editing?]}]
-  (let [form-name (r/atom "")
+  (let [form-brand (r/atom "")
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
     (when editing?
       [:div.item-wrapper.mdl-list__item
        [:span.mdl-list__item-primary-content
-        [input-field {:id (str id "edit-item-name")
+        [input-field {:id (str id "edit-item-brand")
                       :type "text"
                       :autofocus? true
-                      :input-atom form-name
-                      :label "Item/Marca"}]
+                      :input-atom form-brand
+                      :label "Marca"}]
         [input-field {:id (str id "edit-item-price")
                       :type "number"
                       :step "0.01"
@@ -81,7 +85,7 @@
                       :label "Tamanho"}]]
        [:button.save-button.mdl-list__item-secondary-action
         {:on-click #(do
-                      (dispatch [:change-name id @form-name])
+                      (dispatch [:change-brand id @form-brand])
                       (dispatch [:change-price id @form-price])
                       (dispatch [:change-capacity id @form-capacity])
                       (dispatch [:toggle-item-editing id]))}
