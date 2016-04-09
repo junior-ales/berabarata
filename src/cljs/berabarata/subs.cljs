@@ -27,11 +27,6 @@
       (reaction (first (sort-by :liter-price beers-with-liter))))))
 
 (register-sub
-  :editing-beer?
-  (fn [db [_ id]]
-    (reaction (get-in @db [:beers id :editing?]))))
-
-(register-sub
   :editing-new-item?
   (fn [db]
     (reaction (get @db :editing-new-item?))))

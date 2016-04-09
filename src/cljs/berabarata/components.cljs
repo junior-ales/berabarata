@@ -28,7 +28,7 @@
           [:td (str (:capacity @best-beer) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
-(defn item-display [{:keys [id name brand price capacity editing? enabled?]}]
+(defn item-display [{:keys [id name brand price capacity comparing? enabled?]}]
   (let [price-format (when-not (zero? price)
                        (str "R$ " (.toFixed price 2)))
         capacity-format (when-not (zero? capacity)
@@ -46,9 +46,9 @@
       [:span.item-name name]
       [:span.item-info.mdl-list__item-sub-title item-info]]
      [:span.mdl-list__item-secondary-content
-      (when-not editing?
+      (when-not comparing?
         [:button.edit-button.mdl-list__item-secondary-action
-         {:on-click #(dispatch [:toggle-item-editing id])}
+         {:on-click #(dispatch [:toggle-item-comparing id])}
          [:img.icon {:src "./images/icon-more.png" }]])]]))
 
 (defn input-field [{:keys [id type autofocus? step input-atom label]}]
@@ -61,11 +61,11 @@
             :on-change #(reset! input-atom (-> % .-target .-value))}]
    [:label {:class "mdl-textfield__label" :for id} label]])
 
-(defn item-compare [{:keys [id price capacity editing?]}]
+(defn item-compare [{:keys [id price capacity comparing?]}]
   (let [form-brand (r/atom "")
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
-    (when editing?
+    (when comparing?
       [:div.item-wrapper.mdl-list__item
        [:span.mdl-list__item-primary-content
         [input-field {:id (str id "edit-item-brand")
@@ -88,7 +88,7 @@
                       (dispatch [:change-brand id @form-brand])
                       (dispatch [:change-price id @form-price])
                       (dispatch [:change-capacity id @form-capacity])
-                      (dispatch [:toggle-item-editing id]))}
+                      (dispatch [:toggle-item-comparing id]))}
         [:img.icon {:src "./images/icon-done.png" }]]])))
 
 (defn item [item]

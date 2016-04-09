@@ -39,9 +39,9 @@
       (update-in db [:beers id :capacity] #(reader/read-string capacity)))))
 
 (register-handler
-  :toggle-item-editing
+  :toggle-item-comparing
   (fn [db [_ id]]
-    (update-in db [:beers id :editing?] not)))
+    (update-in db [:beers id :comparing?] not)))
 
 (register-handler
   :edit-new-item
@@ -55,7 +55,7 @@
    :capacity 0
    :price 0
    :enabled? true
-   :editing? false})
+   :comparing? false})
 
 (register-handler
   :create-new-item
