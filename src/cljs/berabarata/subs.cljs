@@ -19,9 +19,11 @@
   :best-beer
   (fn [db]
     (let [beers (subscribe [:all-beers])
+          eligible-items (filter #(and (not (zero? (:price %)))
+                                       (not (zero? (:capacity %)))) @beers)
           beers-with-liter (map
                              #(assoc % :liter-price (calc-liter-price %))
-                             @beers)]
+                             eligible-items)]
       (reaction (first (sort-by :liter-price beers-with-liter))))))
 
 (register-sub
