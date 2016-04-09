@@ -6,9 +6,36 @@ html, body {
   margin-top: 0;
 }
 
+.checkbox-avatar {
+  background: none;
+
+  & > .label {
+    margin-left: 10px;
+    margin-top: 3px;
+  }
+}
+
 .item-wrapper {
   padding-left: 0;
   padding-right: 0;
+
+  &.-disabled {
+    opacity: .6;
+
+    & .item-name {
+      text-decoration: line-through;
+    }
+  }
+
+  & .new-item-avatar {
+    background: none;
+    color: #BDBDBD;
+
+    .icon {
+      margin-left: 10px;
+      font-size: 35px;
+    }
+  }
 }
 
 .new-item {

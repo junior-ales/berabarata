@@ -24,13 +24,20 @@
           [:td (str (:capacity @best-beer) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
-(defn beer-item-display [{:keys [id name price capacity editing?]}]
+(defn beer-item-display [{:keys [id name price capacity editing? enabled?]}]
   (let [price-format (str "R$ " (.toFixed price 2))
-        capacity-format (str capacity "ml")]
-    [:div.item-wrapper.mdl-list__item.mdl-list__item--two-line
+        capacity-format (str capacity "ml")
+        default-classes "item-wrapper mdl-list__item mdl-list__item--two-line"]
+    [:div {:class (str default-classes (when-not enabled? (str " -disabled")))}
      [:span.mdl-list__item-primary-content
-      [:i.material-icons.mdl-list__item-avatar "C"]
-      [:span name]
+      [:i.checkbox-avatar.mdl-list__item-avatar
+       [:label.label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect
+        {:for (str id "-item-checkbox")}
+        [:input.mdl-checkbox__input
+         {:id (str id "-item-checkbox")
+          :type "checkbox"
+          :on-change #(dispatch [:toggle-item-state id])}]]]
+      [:span.item-name name]
       [:span.mdl-list__item-sub-title (str price-format " - " capacity-format)]]
      [:span.mdl-list__item-secondary-content
       (when-not editing?
@@ -88,7 +95,8 @@
         form-new-name (r/atom "")]
     [:div.item-wrapper.mdl-list__item
      [:span.mdl-list__item-primary-content
-      [:i.material-icons.mdl-list__item-avatar "+"]
+      [:i.new-item-avatar.material-icons.mdl-list__item-avatar
+       [:span.icon "+"]]
       (if @editing-new-item?
         [:div
          [input-field {:id "edit-new-item-name"

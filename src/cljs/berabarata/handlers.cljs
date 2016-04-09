@@ -42,7 +42,12 @@
     (update-in db [:editing-new-item?] not)))
 
 (defn make-item [id name]
-  {:id id :name name :capacity 0 :price 0 :editing? false})
+  {:id id
+   :name name
+   :capacity 0
+   :price 0
+   :enabled? true
+   :editing? false})
 
 (register-handler
   :create-new-item
@@ -51,3 +56,8 @@
       (-> db
           (assoc-in [:beers item-id] (make-item item-id name))
           (update-in [:editing-new-item?] not)))))
+
+(register-handler
+  :toggle-item-state
+  (fn [db [_ id]]
+    (update-in db [:beers id :enabled?] not)))
