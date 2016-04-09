@@ -28,7 +28,7 @@
           [:td (str (:capacity @best-beer) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
-(defn item-display [{:keys [id name brand price capacity comparing? enabled?]}]
+(defn display-item [{:keys [id name brand price capacity comparing? enabled?]}]
   (let [price-format (when-not (zero? price)
                        (str "R$ " (.toFixed price 2)))
         capacity-format (when-not (zero? capacity)
@@ -61,7 +61,7 @@
             :on-change #(reset! input-atom (-> % .-target .-value))}]
    [:label {:class "mdl-textfield__label" :for id} label]])
 
-(defn item-compare [{:keys [id price capacity comparing?]}]
+(defn compare-item [{:keys [id price capacity comparing?]}]
   (let [form-brand (r/atom "")
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
@@ -91,19 +91,19 @@
                       (dispatch [:toggle-item-comparing id]))}
         [:img.icon {:src "./images/icon-done.png" }]]])))
 
-(defn item [item]
+(defn make-item [item]
   [:li {:key (str (:id item) "-item")}
-   [item-display item]
-   [item-compare item]])
+   [display-item item]
+   [compare-item item]])
 
-(defn item-new []
+(defn new-item []
   [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:edit-new-item])}
    [:span.mdl-list__item-primary-content
     [:i.new-item-avatar.material-icons.mdl-list__item-avatar
      [:span.icon "✚"]]
     [:span.label "Novo item..."]]])
 
-(defn item-edit []
+(defn edit-new-item []
   (let [form-new-name (r/atom "")]
     [:div.item-wrapper.-new.mdl-list__item
      [:span.mdl-list__item-primary-content
@@ -122,10 +122,10 @@
 (defn add-new-item []
   (let [editing-new-item? (subscribe [:editing-new-item?])]
     (if @editing-new-item?
-      [item-edit]
-      [item-new])))
+      [edit-new-item]
+      [new-item])))
 
 (defn item-list [items]
   [:ul.mdl-list
-   (map item items)
+   (map make-item items)
    [add-new-item]])
