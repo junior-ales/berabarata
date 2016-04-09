@@ -3,9 +3,7 @@
             [re-frame.core :refer [register-handler]]))
 
 (def initial-state
-  {:beers  {"beer0" {:id "beer0" :name "Cerveja A" :capacity 0 :price 0 :editing? false}
-            "beer1" {:id "beer1" :name "Cerveja B" :capacity 0 :price 0 :editing? false}}
-   :editing-new-item? false})
+  {:beers {} :editing-new-item? false})
 
 (register-handler
   :initialize
