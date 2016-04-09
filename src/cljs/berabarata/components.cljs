@@ -1,7 +1,6 @@
 (ns berabarata.components
   (:require [reagent.core  :as    r]
-            [re-frame.core :refer [dispatch subscribe]]
-            [clojure.string :refer [join blank?]]))
+            [re-frame.core :refer [dispatch subscribe]]))
 
 (defn title []
   [:header
@@ -31,7 +30,7 @@
         capacity-format (when-not (zero? capacity)
                           (str capacity "ml"))
         item-info (when (or price-format capacity-format)
-                    (join " ⸳ " (remove blank? [price-format capacity-format])))
+                    (apply str (interpose " ⸳ " (remove nil? [price-format capacity-format]))))
         default-classes "item-wrapper mdl-list__item mdl-list__item--two-line"]
     [:div {:class (str default-classes (when-not enabled? (str " -disabled")))}
      [:span.mdl-list__item-primary-content
