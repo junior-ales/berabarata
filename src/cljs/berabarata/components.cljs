@@ -96,7 +96,9 @@
     [:div.item-wrapper.mdl-list__item
      [:span.mdl-list__item-primary-content
       [:i.new-item-avatar.material-icons.mdl-list__item-avatar
-       [:span.icon "+"]]
+       [:span.icon
+        {:on-click #(dispatch [:edit-new-item])}
+        (if @editing-new-item? "✖" "✚")]]
       (if @editing-new-item?
         [:div
          [input-field {:id "edit-new-item-name"
