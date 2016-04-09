@@ -4,7 +4,8 @@
 
 (def initial-state
   {:beers  {"beer0" {:id "beer0" :name "Cerveja A" :capacity 0 :price 0 :editing? false}
-            "beer1" {:id "beer1" :name "Cerveja B" :capacity 0 :price 0 :editing? false}}})
+            "beer1" {:id "beer1" :name "Cerveja B" :capacity 0 :price 0 :editing? false}}
+   :editing-new-item? false})
 
 (register-handler
   :initialize
@@ -33,7 +34,22 @@
       (update-in db [:beers id :capacity] #(reader/read-string capacity)))))
 
 (register-handler
-  :toggle-beer-editing
+  :toggle-item-editing
   (fn [db [_ id]]
     (update-in db [:beers id :editing?] not)))
 
+(register-handler
+  :edit-new-item
+  (fn [db]
+    (update-in db [:editing-new-item?] not)))
+
+(defn make-item [id name]
+  {:id id :name name :capacity 0 :price 0 :editing? false})
+
+(register-handler
+  :create-new-item
+  (fn [db [_ name]]
+    (let [item-id (str "item-" (inc (count (:beers db))))]
+      (-> db
+          (assoc-in [:beers item-id] (make-item item-id name))
+          (update-in [:editing-new-item?] not)))))

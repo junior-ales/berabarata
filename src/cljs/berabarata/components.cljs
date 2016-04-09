@@ -27,7 +27,7 @@
 (defn beer-item-display [{:keys [id name price capacity editing?]}]
   (let [price-format (str "R$ " (.toFixed price 2))
         capacity-format (str capacity "ml")]
-    [:div.show-item-wrapper.mdl-list__item.mdl-list__item--two-line
+    [:div.item-wrapper.mdl-list__item.mdl-list__item--two-line
      [:span.mdl-list__item-primary-content
       [:i.material-icons.mdl-list__item-avatar "C"]
       [:span name]
@@ -35,7 +35,7 @@
      [:span.mdl-list__item-secondary-content
       (when-not editing?
         [:button.edit-button.mdl-list__item-secondary-action
-         {:on-click #(dispatch [:toggle-beer-editing id])}
+         {:on-click #(dispatch [:toggle-item-editing id])}
          [:img.icon {:src "./images/icon-more.png" }]])]]))
 
 (defn input-field [{:keys [id type autofocus? step input-atom label]}]
@@ -53,7 +53,7 @@
         form-price (r/atom 0)
         form-capacity (r/atom 0)]
     (when editing?
-      [:div.edit-item-wrapper.mdl-list__item
+      [:div.item-wrapper.mdl-list__item
        [:span.mdl-list__item-primary-content
         [input-field {:id (str id "edit-item-name")
                       :type "text"
@@ -75,14 +75,36 @@
                       (dispatch [:change-name id @form-name])
                       (dispatch [:change-price id @form-price])
                       (dispatch [:change-capacity id @form-capacity])
-                      (dispatch [:toggle-beer-editing id]))}
+                      (dispatch [:toggle-item-editing id]))}
         [:img.icon {:src "./images/icon-done.png" }]]])))
 
-(defn beer-item [{:keys [id] :as beer}]
-  [:li {:key (str id "-item")}
+(defn beer-item [beer]
+  [:li {:key (str (:id beer) "-item")}
    [beer-item-display beer]
    [beer-item-edit beer]])
 
+(defn new-item []
+  (let [editing-new-item? (subscribe [:editing-new-item?])
+        form-new-name (r/atom "")]
+    [:div.item-wrapper.mdl-list__item
+     [:span.mdl-list__item-primary-content
+      [:i.material-icons.mdl-list__item-avatar "+"]
+      (if @editing-new-item?
+        [:div
+         [input-field {:id "edit-new-item-name"
+                       :autofocus? true
+                       :type "text"
+                       :input-atom form-new-name
+                       :label "Nome"}]
+         [:button.save-button.mdl-list__item-secondary-action
+          {:on-click #(dispatch [:create-new-item @form-new-name])}
+          [:img.icon {:src "./images/icon-done.png" }]]]
+        [:div
+         [:span.new-item
+          {:on-click #(dispatch [:edit-new-item])}
+          "Novo item..."]])]]))
+
 (defn beer-list [beers]
   [:ul.mdl-list
-   (map beer-item beers)])
+   (map beer-item beers)
+   [new-item]])
