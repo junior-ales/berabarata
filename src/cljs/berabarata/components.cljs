@@ -1,6 +1,7 @@
 (ns berabarata.components
   (:require [reagent.core  :as    r]
-            [re-frame.core :refer [dispatch subscribe]]))
+            [re-frame.core :refer [dispatch subscribe]]
+            [clojure.string :refer [join blank?]]))
 
 (defn title []
   [:header
@@ -25,8 +26,12 @@
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
 (defn beer-item-display [{:keys [id name price capacity editing? enabled?]}]
-  (let [price-format (str "R$ " (.toFixed price 2))
-        capacity-format (str capacity "ml")
+  (let [price-format (when-not (zero? price)
+                       (str "R$ " (.toFixed price 2)))
+        capacity-format (when-not (zero? capacity)
+                          (str capacity "ml"))
+        item-info (when (or price-format capacity-format)
+                    (join " ⸳ " (remove blank? [price-format capacity-format])))
         default-classes "item-wrapper mdl-list__item mdl-list__item--two-line"]
     [:div {:class (str default-classes (when-not enabled? (str " -disabled")))}
      [:span.mdl-list__item-primary-content
@@ -38,7 +43,7 @@
           :type "checkbox"
           :on-change #(dispatch [:toggle-item-state id])}]]]
       [:span.item-name name]
-      [:span.mdl-list__item-sub-title (str price-format " - " capacity-format)]]
+      [:span.mdl-list__item-sub-title item-info]]
      [:span.mdl-list__item-secondary-content
       (when-not editing?
         [:button.edit-button.mdl-list__item-secondary-action
