@@ -49,7 +49,7 @@
     (update-in db [:beers id :editing?] not)))
 
 (register-handler
-  :edit-new-item
+  :toggle-new-item-editing
   (fn [db]
     (update-in db [:editing-new-item?] not)))
 
@@ -67,9 +67,7 @@
   :create-new-item
   (fn [db [_ name]]
     (let [item-id (str "item-" (inc (count (:beers db))))]
-      (-> db
-          (assoc-in [:beers item-id] (make-item item-id name))
-          (update-in [:editing-new-item?] not)))))
+      (assoc-in db [:beers item-id] (make-item item-id name)))))
 
 (register-handler
   :toggle-item-state

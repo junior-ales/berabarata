@@ -23,19 +23,21 @@
           [:th "Preço Litro"]]]
         [:tbody
          [:tr
-          [:td.mdl-data-table__cell--non-numeric (interpose-sep " ⸳ "
-                                                                [(:name @best-beer) (:brand @best-beer)])]
+          [:td.mdl-data-table__cell--non-numeric
+           (interpose-sep " ⸳ "
+                          [(:name @best-beer) (:brand @best-beer)])]
           [:td (str (:capacity @best-beer) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
-(defn input-field [{:keys [id type autofocus? step input-atom label]}]
+(defn input-field [{:keys [id type autofocus? step input-atom label more-settings]}]
   [:div.edit-item-box.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused
-   [:input {:id id
-            :class "mdl-textfield__input"
-            :type type
-            :auto-focus (or autofocus? false)
-            :step step
-            :on-change #(reset! input-atom (-> % .-target .-value))}]
+   [:input (merge {:id id
+                   :class "mdl-textfield__input"
+                   :type type
+                   :auto-focus (or autofocus? false)
+                   :step step
+                   :on-change #(reset! input-atom (-> % .-target .-value))}
+                  more-settings)]
    [:label {:class "mdl-textfield__label" :for id} label]])
 
 (defn display-item [{:keys [id name brand price capacity comparing? editing? enabled?]}]
@@ -53,13 +55,13 @@
      (if editing?
        [:span.mdl-list__item-primary-content
         [:i.item-avatar.material-icons.mdl-list__item-avatar
-         [:span.icon
-          {:on-click #(dispatch [:toggle-item-editing id])} "✖"]]
+         [:span.icon "✖"]]
         [input-field {:id (str id "edit-item-name")
                       :type "text"
                       :autofocus? true
                       :input-atom form-name
-                      :label "Nome"}]]
+                      :label "Nome"
+                      :more-settings {:on-blur #(dispatch [:toggle-item-editing id])}}]]
        [:span.mdl-list__item-primary-content
         [:input {:class "toggle-item-status"
                  :type "checkbox"
@@ -70,9 +72,7 @@
          [:span.item-info.mdl-list__item-sub-title item-info]]])
      (when editing?
        [:button.save-button.mdl-list__item-secondary-action
-        {:on-click #(do
-                      (dispatch [:change-name id @form-name])
-                      (dispatch [:toggle-item-editing id]))}
+        {:on-click #(dispatch [:change-name id @form-name])}
         [:img.icon {:src "./images/icon-done.png" }]])
      (when-not (or editing? comparing?)
        [:button.edit-button.mdl-list__item-secondary-action
@@ -115,7 +115,7 @@
    [compare-item item]])
 
 (defn new-item []
-  [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:edit-new-item])}
+  [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:toggle-new-item-editing])}
    [:span.mdl-list__item-primary-content
     [:i.item-avatar.material-icons.mdl-list__item-avatar
      [:span.icon "✚"]]
@@ -126,13 +126,13 @@
     [:div.item-wrapper.-new.mdl-list__item
      [:span.mdl-list__item-primary-content
       [:i.item-avatar.material-icons.mdl-list__item-avatar
-       [:span.icon
-        {:on-click #(dispatch [:edit-new-item])} "✖"]]
+       [:span.icon "✖"]]
       [input-field {:id "edit-new-item-name"
                     :autofocus? true
                     :type "text"
                     :input-atom form-new-name
-                    :label "Nome"}]]
+                    :label "Nome"
+                    :more-settings {:on-blur #(dispatch [:toggle-new-item-editing])}}]]
      [:button.save-button.mdl-list__item-secondary-action
       {:on-click #(dispatch [:create-new-item @form-new-name])}
       [:img.icon {:src "./images/icon-done.png" }]]]))
