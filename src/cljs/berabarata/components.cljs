@@ -2,10 +2,6 @@
   (:require [reagent.core  :as    r]
             [re-frame.core :refer [dispatch subscribe]]))
 
-(defn title []
-  [:header
-   [:h4.title "Lista de Compras"]])
-
 (defn interpose-sep [separator items]
   (apply str (interpose separator (remove nil? items))))
 
@@ -109,11 +105,6 @@
                       (dispatch [:toggle-item-comparing id]))}
         [:img.icon {:src "./images/icon-done.png" }]]])))
 
-(defn make-item [item]
-  [:li {:key (str (:id item) "-item")}
-   [display-item item]
-   [compare-item item]])
-
 (defn new-item []
   [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:toggle-new-item-editing])}
    [:span.mdl-list__item-primary-content
@@ -143,7 +134,28 @@
       [edit-new-item]
       [new-item])))
 
+(defn make-items [item]
+  [:li {:key (str (:id item) "-item")}
+   [display-item item]
+   [compare-item item]])
+
+(defn enabled-items [items]
+  (let [enabled-items (filter :enabled? items)]
+    (when (not (zero? (count enabled-items)))
+      [:ul.item-list.mdl-list
+       (map make-items enabled-items)])))
+
+(defn disabled-items [items]
+  (let [disabled-items (filter #(not (:enabled? %)) items)]
+    (when (not (zero? (count disabled-items)))
+      [:section
+       [:h5.title "Itens Comprados"]
+       [:ul.item-list.mdl-list
+        (map make-items disabled-items)]])))
+
 (defn item-list [items]
-  [:ul.mdl-list
-   (map make-item items)
-   [add-new-item]])
+  [:section
+   [:h5.title "Lista de Compras"]
+   [enabled-items items]
+   [add-new-item]
+   [disabled-items items]])
