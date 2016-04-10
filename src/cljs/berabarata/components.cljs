@@ -50,8 +50,7 @@
                        (when-not (nil? item-info) " -with-info mdl-list__item--two-line"))}
      (if editing?
        [:span.mdl-list__item-primary-content
-        [:i.item-avatar.material-icons.mdl-list__item-avatar
-         [:span.icon "✖"]]
+        [:i.icon.-danger.item-avatar.material-icons.mdl-list__item-avatar "clear"]
         [input-field {:id (str id "edit-item-name")
                       :type "text"
                       :autofocus? true
@@ -69,11 +68,11 @@
      (when editing?
        [:button.save-button.mdl-list__item-secondary-action
         {:on-click #(dispatch [:change-name id @form-name])}
-        [:img.icon {:src "./images/icon-done.png" }]])
+        [:i.icon.-success.material-icons "done"]])
      (when-not (or editing? comparing?)
        [:button.edit-button.mdl-list__item-secondary-action
         {:on-click #(dispatch [:toggle-item-comparing id])}
-        [:img.icon {:src "./images/icon-more.png" }]])]))
+        [:i.icon.-normal.material-icons "more_vert"]])]))
 
 (defn compare-item [{:keys [id price capacity comparing?]}]
   (let [form-brand (r/atom "")
@@ -103,21 +102,19 @@
                       (dispatch [:change-price id @form-price])
                       (dispatch [:change-capacity id @form-capacity])
                       (dispatch [:toggle-item-comparing id]))}
-        [:img.icon {:src "./images/icon-done.png" }]]])))
+        [:i.icon.-success.material-icons "done"]]])))
 
 (defn new-item []
   [:div.item-wrapper.-new.mdl-list__item {:on-click #(dispatch [:toggle-new-item-editing])}
    [:span.mdl-list__item-primary-content
-    [:i.item-avatar.material-icons.mdl-list__item-avatar
-     [:span.icon "✚"]]
+    [:i.icon.-normal.item-avatar.material-icons.mdl-list__item-avatar "add"]
     [:span.label "Novo item..."]]])
 
 (defn edit-new-item []
   (let [form-new-name (r/atom "")]
     [:div.item-wrapper.-new.mdl-list__item
      [:span.mdl-list__item-primary-content
-      [:i.item-avatar.material-icons.mdl-list__item-avatar
-       [:span.icon "✖"]]
+      [:i.icon.-danger.item-avatar.material-icons.mdl-list__item-avatar "clear"]
       [input-field {:id "edit-new-item-name"
                     :autofocus? true
                     :type "text"
@@ -126,7 +123,7 @@
                     :more-settings {:on-blur #(dispatch [:toggle-new-item-editing])}}]]
      [:button.save-button.mdl-list__item-secondary-action
       {:on-click #(dispatch [:create-new-item @form-new-name])}
-      [:img.icon {:src "./images/icon-done.png" }]]]))
+      [:i.icon.-success.material-icons "done"]]]))
 
 (defn add-new-item []
   (let [editing-new-item? (subscribe [:editing-new-item?])]
