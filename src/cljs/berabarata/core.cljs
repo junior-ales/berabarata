@@ -4,9 +4,9 @@
             [berabarata.components :refer [item-list results]]))
 
 (defn main-panel []
-  (let [beers (subscribe [:all-beers])]
+  (let [items (subscribe [:all-items])]
     [:section
-     [item-list @beers]
+     [item-list @items]
      [results]]))
 
 (defn ^:export init []

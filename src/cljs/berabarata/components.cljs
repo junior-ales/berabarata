@@ -6,8 +6,8 @@
   (apply str (interpose separator (remove nil? items))))
 
 (defn results []
-  (let [best-beer (subscribe [:best-beer])
-        liter-price (or (:liter-price @best-beer) 0)]
+  (let [cheapeast-item (subscribe [:cheapest-item])
+        liter-price (or (:liter-price @cheapeast-item) 0)]
     (when-not (zero? liter-price)
       [:section
        [:h5 "Resultado"]
@@ -21,8 +21,8 @@
          [:tr
           [:td.mdl-data-table__cell--non-numeric
            (interpose-sep " ⸳ "
-                          [(:name @best-beer) (:brand @best-beer)])]
-          [:td (str (:capacity @best-beer) "ml")]
+                          [(:name @cheapeast-item) (:brand @cheapeast-item)])]
+          [:td (str (:capacity @cheapeast-item) "ml")]
           [:td (str "R$" (-> liter-price (.toFixed 2)))]]]]])))
 
 (defn input-field [{:keys [id type autofocus? step input-atom label more-settings]}]

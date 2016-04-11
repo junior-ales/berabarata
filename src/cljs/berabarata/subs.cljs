@@ -4,27 +4,28 @@
                                    subscribe]]))
 
 (register-sub
-  :all-beers
+  :all-items
   (fn [db]
-    (reaction (vals (:beers @db)))))
+    (reaction (vals (:items @db)))))
 
 (defn calc-liter-price [{:keys [price capacity]}]
-  (when-not (or (zero? price)
-                (zero? capacity))
-    (-> price
-        (* 1000.0)
-        (/ capacity))))
+  (-> price (* 1000.0) (/ capacity)))
+
+(defn add-liter-price [item]
+  (assoc item :liter-price (calc-liter-price item)))
+
+(defn valid-items [{:keys [price capacity]}]
+  (not (or (zero? price)
+           (zero? capacity))))
 
 (register-sub
-  :best-beer
+  :cheapest-item
   (fn [db]
-    (let [beers (subscribe [:all-beers])
-          eligible-items (filter #(and (not (zero? (:price %)))
-                                       (not (zero? (:capacity %)))) @beers)
-          beers-with-liter (map
-                             #(assoc % :liter-price (calc-liter-price %))
-                             eligible-items)]
-      (reaction (first (sort-by :liter-price beers-with-liter))))))
+    (let [items            (subscribe [:all-items])
+          eligible-items   (filter valid-items @items)
+          items-with-liter (map add-liter-price eligible-items)]
+      (reaction (first
+                  (sort-by :liter-price items-with-liter))))))
 
 (register-sub
   :editing-new-item?

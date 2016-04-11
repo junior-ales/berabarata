@@ -3,7 +3,7 @@
             [re-frame.core :refer [register-handler]]))
 
 (def initial-state
-  {:beers {} :editing-new-item? false})
+  {:items {} :editing-new-item? false})
 
 (register-handler
   :initialize
@@ -15,38 +15,38 @@
   (fn [db [_ id name]]
     (if (empty? (clojure.string/trim (or name "")))
       db
-      (update-in db [:beers id :name] #(str name)))))
+      (update-in db [:items id :name] #(str name)))))
 
 (register-handler
   :change-brand
   (fn [db [_ id brand]]
     (if (empty? (clojure.string/trim (or brand "")))
       db
-      (update-in db [:beers id :brand] #(str brand)))))
+      (update-in db [:items id :brand] #(str brand)))))
 
 (register-handler
   :change-price
   (fn [db [_ id price]]
     (if (number? price)
       db
-      (update-in db [:beers id :price] #(reader/read-string price)))))
+      (update-in db [:items id :price] #(reader/read-string price)))))
 
 (register-handler
   :change-capacity
   (fn [db [_ id capacity]]
     (if (number? capacity)
       db
-      (update-in db [:beers id :capacity] #(reader/read-string capacity)))))
+      (update-in db [:items id :capacity] #(reader/read-string capacity)))))
 
 (register-handler
   :toggle-item-comparing
   (fn [db [_ id]]
-    (update-in db [:beers id :comparing?] not)))
+    (update-in db [:items id :comparing?] not)))
 
 (register-handler
   :toggle-item-editing
   (fn [db [_ id]]
-    (update-in db [:beers id :editing?] not)))
+    (update-in db [:items id :editing?] not)))
 
 (register-handler
   :toggle-new-item-editing
@@ -66,10 +66,10 @@
 (register-handler
   :create-new-item
   (fn [db [_ name]]
-    (let [item-id (str "item-" (inc (count (:beers db))))]
-      (assoc-in db [:beers item-id] (make-item item-id name)))))
+    (let [item-id (str "item-" (inc (count (:items db))))]
+      (assoc-in db [:items item-id] (make-item item-id name)))))
 
 (register-handler
   :toggle-item-state
   (fn [db [_ id]]
-    (update-in db [:beers id :enabled?] not)))
+    (update-in db [:items id :enabled?] not)))
